@@ -11,6 +11,7 @@ mode        : selfcontained # {standalone, draft}
 github:
   user: everdark
   repo: lecture_ggplot
+license: by-nc-sa
 
 --- &twocol
 
