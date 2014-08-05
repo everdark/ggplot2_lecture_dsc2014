@@ -60,7 +60,7 @@ library(gridExtra)
 + Fancy by default
   + Good for demo
 + Strong supportive community
-  + The mostly downloaded CRAN package
+  + The mostly downloaded CRAN package ([source](http://www.rdocumentation.org/))
 
 <div style='text-align: center;'>
     <img height='360' src='assets/img/ranking.png' />
@@ -153,8 +153,7 @@ ggp_bygrp <- ggplot(siris, aes(x=Species, fill=Fat)); ggp_bygrp + geom_bar()
 
 ## Bar Plot: Dodge by group 
 ```{r,fig.align='center', fig.retina=2, fig.height=6.5, fig.width=6.5}
-ggp_bygrp + geom_bar(position='dodge')
-ggp_bygrp + geom_bar(position=position_dodge(1))
+ggp_bygrp + geom_bar(position='dodge') # ggp_bygrp + geom_bar(position=position_dodge(1))
 ```
 
 ---
@@ -886,8 +885,8 @@ gg + facet_grid(Action ~ .) # Plot with grouping variable in different window (V
 
 ## Facet: Single grouping
 ```{r,fig.align='center', fig.retina=2, fig.height=6.5, fig.width=8, message=FALSE, results='hold'}
-gg + facet_grid(. ~ Action) 
 # Plot with grouping variable in different window (Horizontal)
+gg + facet_grid(. ~ Action) 
 ```
 
 ---

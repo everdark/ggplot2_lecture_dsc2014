@@ -57,7 +57,7 @@ license: by-nc-sa
 + Fancy by default
   + Good for demo
 + Strong supportive community
-  + The mostly downloaded CRAN package
+  + The mostly downloaded CRAN package ([source](http://www.rdocumentation.org/))
 
 <div style='text-align: center;'>
     <img height='360' src='assets/img/ranking.png' />
@@ -169,16 +169,10 @@ ggp_bygrp <- ggplot(siris, aes(x=Species, fill=Fat)); ggp_bygrp + geom_bar()
 ## Bar Plot: Dodge by group 
 
 ```r
-ggp_bygrp + geom_bar(position='dodge')
+ggp_bygrp + geom_bar(position='dodge') # ggp_bygrp + geom_bar(position=position_dodge(1))
 ```
 
-<img src="assets/fig/unnamed-chunk-81.png" title="plot of chunk unnamed-chunk-8" alt="plot of chunk unnamed-chunk-8" width="468" style="display: block; margin: auto;" />
-
-```r
-ggp_bygrp + geom_bar(position=position_dodge(1))
-```
-
-<img src="assets/fig/unnamed-chunk-82.png" title="plot of chunk unnamed-chunk-8" alt="plot of chunk unnamed-chunk-8" width="468" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-8.png" title="plot of chunk unnamed-chunk-8" alt="plot of chunk unnamed-chunk-8" width="468" style="display: block; margin: auto;" />
 
 ---
 
@@ -1090,14 +1084,11 @@ gg + facet_grid(Action ~ .) # Plot with grouping variable in different window (V
 ## Facet: Single grouping
 
 ```r
+# Plot with grouping variable in different window (Horizontal)
 gg + facet_grid(. ~ Action) 
 ```
 
 <img src="assets/fig/unnamed-chunk-81.png" title="plot of chunk unnamed-chunk-81" alt="plot of chunk unnamed-chunk-81" width="576" style="display: block; margin: auto;" />
-
-```r
-# Plot with grouping variable in different window (Horizontal)
-```
 
 ---
 

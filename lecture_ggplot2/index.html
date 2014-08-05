@@ -131,7 +131,7 @@
 <li>Strong supportive community
 
 <ul>
-<li>The mostly downloaded CRAN package</li>
+<li>The mostly downloaded CRAN package (<a href="http://www.rdocumentation.org/">source</a>)</li>
 </ul></li>
 </ul>
 
@@ -321,15 +321,10 @@ ggp_bygrp &lt;- ggplot(siris, aes(x=Species, fill=Fat)); ggp_bygrp + geom_bar()
     <h2>Bar Plot: Dodge by group</h2>
   </hgroup>
   <article data-timings="">
-    <pre><code class="r">ggp_bygrp + geom_bar(position=&#39;dodge&#39;)
+    <pre><code class="r">ggp_bygrp + geom_bar(position=&#39;dodge&#39;) # ggp_bygrp + geom_bar(position=position_dodge(1))
 </code></pre>
 
-<p><img src="assets/fig/unnamed-chunk-81.png" title="plot of chunk unnamed-chunk-8" alt="plot of chunk unnamed-chunk-8" width="468" style="display: block; margin: auto;" /></p>
-
-<pre><code class="r">ggp_bygrp + geom_bar(position=position_dodge(1))
-</code></pre>
-
-<p><img src="assets/fig/unnamed-chunk-82.png" title="plot of chunk unnamed-chunk-8" alt="plot of chunk unnamed-chunk-8" width="468" style="display: block; margin: auto;" /></p>
+<p><img src="assets/fig/unnamed-chunk-8.png" title="plot of chunk unnamed-chunk-8" alt="plot of chunk unnamed-chunk-8" width="468" style="display: block; margin: auto;" /></p>
 
   </article>
   <!-- Presenter Notes -->
@@ -1599,13 +1594,11 @@ gg + facet_grid(Action ~ .) # Plot with grouping variable in different window (V
     <h2>Facet: Single grouping</h2>
   </hgroup>
   <article data-timings="">
-    <pre><code class="r">gg + facet_grid(. ~ Action) 
+    <pre><code class="r"># Plot with grouping variable in different window (Horizontal)
+gg + facet_grid(. ~ Action) 
 </code></pre>
 
 <p><img src="assets/fig/unnamed-chunk-81.png" title="plot of chunk unnamed-chunk-81" alt="plot of chunk unnamed-chunk-81" width="576" style="display: block; margin: auto;" /></p>
-
-<pre><code class="r"># Plot with grouping variable in different window (Horizontal)
-</code></pre>
 
   </article>
   <!-- Presenter Notes -->
