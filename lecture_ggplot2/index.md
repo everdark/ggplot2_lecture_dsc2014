@@ -1,5 +1,5 @@
 ---
-title       : R Visualization
+title       : Introductory R Visualization
 subtitle    : Using ggplot2
 author      : Kyle Chung
 job         : DSConf 2014 Taipei
@@ -46,18 +46,27 @@ license: by-nc-sa
   + Bar Plots
   + Line Graphs
   + Scatter plots
-+ Advanced Graphing Tips
-  + Annotaton
-  + Facet: Multi-plotting
-+ Output
++ Some Advanced Graphing Tips
+  + [Bonus] Annotaton
+  + [Bonus] Facet: Multi-plotting
 
----
+--- &twocol
 
 ## Why `ggplot2`?
-+ Fancy by default
-  + Good for demo
+
+*** =left
+
++ Fancy by default; hence good for
+  + Demo
+  + Report
+  + Dcumentation
++ Consistent across all kinds of plot in
+  + Behavior
+  + Syntax
 + Strong supportive community
-  + The mostly downloaded CRAN package ([source](http://www.rdocumentation.org/))
+  + The mostly downloaded package on CRAN ([source](http://www.rdocumentation.org/))
+
+*** =right
 
 <div style='text-align: center;'>
     <img height='360' src='assets/img/ranking.png' />
@@ -66,34 +75,56 @@ license: by-nc-sa
 ---
 
 ## About this lecture
+>
+
 + What will be covered:
   + Usual works
-  + Common issues encountered in the usual works
+  + Common issues encountered in usual works
+  
+---
+
 + What will NOT be covered:
-  + Dynamic graphing
+  + Dynamic graphing: refer to `ggvis`, `rCharts`, or `googleVis`
+  + Map graphing: refer to `ggmap`
   + Data preprocessing
   + PIE CHART (I'm sorry.)
 
----
+--- .segue .nobackground .dark
 
 ## Basic Syntax
-+ [Official document](http://ggplot2.org/)
-+ All you need is `ggplot`
-    + There is also `qplot` for a quick and dirty plot (not recommended)
-+ Usage: `ggplot(data, aes(), ...) + geoms`
+
+--- 
+
+## ggplot(data, aes(x, y, group, ...)) + geom_object(...)
+
++ All you need is the function `ggplot`
+    + There is also a quick and dirty `qplot` (not recommended)
++ Usage:
     + data: an object of class `data.frame`; **data** to be plotted
     + aes: a function that returns aesthetic mappings; **variables** to be plotted
-    + geoms: geometric objects; the **type** of plot
+    + geom_object: geometric objects; the **type** of plot
         + `geom_bar()`, `geom_line()`, `geom_point()`, ...
+        
+---
+        
 + Example:
-    + `ggplot(data=iris, aes(x=Sepal.Length, y=Sepal.Width)) + geom_point()`
+
+```r
+library(ggplot2)
+ggplot(data=iris, aes(x=Sepal.Length, y=Sepal.Width)) + geom_point()
+```
+
+---
+
+## Example plotted
+<img src="assets/fig/unnamed-chunk-3.png" title="plot of chunk unnamed-chunk-3" alt="plot of chunk unnamed-chunk-3" width="504" style="display: block; margin: auto;" />
 
 ---
 
 ## Factor or Numeric?
 + Variable class affects `ggplot`'s behavior
-+ Variable class affects `ggplot`'s behavior. Twice.
-+ Always check your data.frame (use `str`) before calling `ggplot`
++ Variable class affects `ggplot`'s behavior. **Twice**.
++ Always check your data.frame (use `str` or `class`) before calling `ggplot`
 
 --- .segue .nobackground .dark
 
@@ -108,36 +139,29 @@ siris <- iris[iris$Sepal.Length > median(iris$Sepal.Length),]
 barplot(table(siris$Species))
 ```
 
-<img src="assets/fig/unnamed-chunk-2.png" title="plot of chunk unnamed-chunk-2" alt="plot of chunk unnamed-chunk-2" width="504" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-4.png" title="plot of chunk unnamed-chunk-4" alt="plot of chunk unnamed-chunk-4" width="504" style="display: block; margin: auto;" />
 
 ---
 
-## Bar Plot: Oops, Setosa is missing...
+## Before we get the job done...
++ Let's take a look at the help page of `graphics::barplot`
+
+<div style='text-align: center;'>
+    <img src='assets/img/barplot_help.png' />
+</div>
+
++ `graphics::barplot` provides a flexability of different class/format of input
++ And this is good, in general
++ Ineed, all plotting function in `graphics` provide more or less flexability about the input data
++ The problem is, they differ from each other about how flexability is defined
++ When it comes to `ggplot2`, all plotting functions share the same behavior
+
+---
+
+## Back to the job: Oops, Setosa is missing...
 
 ```r
 ggp <- ggplot(data=siris, aes(x=Species))
-ggp + geom_bar()
-```
-
-<img src="assets/fig/unnamed-chunk-3.png" title="plot of chunk unnamed-chunk-3" alt="plot of chunk unnamed-chunk-3" width="468" style="display: block; margin: auto;" />
-
----
-
-## Bar Plot: Force display of x-labels
-
-```r
-ggp <- ggp + scale_x_discrete(drop=FALSE) # keep zero-occurence variable
-ggp + geom_bar()
-```
-
-<img src="assets/fig/unnamed-chunk-4.png" title="plot of chunk unnamed-chunk-4" alt="plot of chunk unnamed-chunk-4" width="468" style="display: block; margin: auto;" />
-
----
-
-## Bar Plot: Change labels!
-
-```r
-ggp <- ggp + ylab('Count') + ggtitle('Hello ggplot!')
 ggp + geom_bar()
 ```
 
@@ -145,93 +169,39 @@ ggp + geom_bar()
 
 ---
 
-## Bar Plot: Change colors!
+## Force display of x-labels
 
 ```r
-ggp + geom_bar(fill='snow', color='black') # see colors() if you're picky
+ggp <- ggp + scale_x_discrete(drop=FALSE) # keep zero-occurence variable
+ggp + geom_bar()
 ```
 
 <img src="assets/fig/unnamed-chunk-6.png" title="plot of chunk unnamed-chunk-6" alt="plot of chunk unnamed-chunk-6" width="468" style="display: block; margin: auto;" />
 
 ---
 
-## Bar Plot: Stack by group 
+## Change labels!
 
 ```r
-siris <- within(siris, Fat <- (Sepal.Width > median(Sepal.Width)))
-ggp_bygrp <- ggplot(siris, aes(x=Species, fill=Fat)); ggp_bygrp + geom_bar()
+ggp <- ggp + ylab('Count') + ggtitle('Hello ggplot!')
+ggp + geom_bar()
 ```
 
 <img src="assets/fig/unnamed-chunk-7.png" title="plot of chunk unnamed-chunk-7" alt="plot of chunk unnamed-chunk-7" width="468" style="display: block; margin: auto;" />
 
 ---
 
-## Bar Plot: Dodge by group 
+## Change colors!
 
 ```r
-ggp_bygrp + geom_bar(position='dodge') # ggp_bygrp + geom_bar(position=position_dodge(1))
+ggp + geom_bar(fill='snow', color='black') # see colors() if you're picky
 ```
 
 <img src="assets/fig/unnamed-chunk-8.png" title="plot of chunk unnamed-chunk-8" alt="plot of chunk unnamed-chunk-8" width="468" style="display: block; margin: auto;" />
 
----
-
-## Bar Plot: What if x is continuous...
-
-```r
-ggplot(iris, aes(x=Sepal.Length)) + geom_bar() # a HISTOGRAM indeed!
-```
-
-<img src="assets/fig/unnamed-chunk-9.png" title="plot of chunk unnamed-chunk-9" alt="plot of chunk unnamed-chunk-9" width="468" style="display: block; margin: auto;" />
-
----
-
-## Overlapping Histogram
-
-```r
-ggplot(iris, aes(x=Sepal.Length, fill=Species)) + 
-  geom_bar(position='identity', alpha=.4)
-```
-
-<img src="assets/fig/unnamed-chunk-10.png" title="plot of chunk unnamed-chunk-10" alt="plot of chunk unnamed-chunk-10" width="648" style="display: block; margin: auto;" />
-
----
-
-## Overlapping Density
-
-```r
-ggplot(iris, aes(x=Sepal.Length, fill=Species)) + 
-  geom_density(position='identity', alpha=.4)
-```
-
-<img src="assets/fig/unnamed-chunk-11.png" title="plot of chunk unnamed-chunk-11" alt="plot of chunk unnamed-chunk-11" width="648" style="display: block; margin: auto;" />
-
-
----
-
-## Overlapping Histogram with Density... Oops!
-
-```r
-ggplot(iris, aes(x=Sepal.Length, fill=Species)) + 
-  geom_bar(position='identity', alpha=.4) + geom_density(position='identity', alpha=.4)
-```
-
-<img src="assets/fig/unnamed-chunk-12.png" title="plot of chunk unnamed-chunk-12" alt="plot of chunk unnamed-chunk-12" width="648" style="display: block; margin: auto;" />
-
----
-
-## Overlapping Histogram with Density
-
-```r
-ggplot(iris, aes(x=Sepal.Length, y=..density.., fill=Species)) + 
-  geom_bar(position='identity', alpha=.4) + geom_density(position='identity', alpha=.4)
-```
-
-<img src="assets/fig/unnamed-chunk-13.png" title="plot of chunk unnamed-chunk-13" alt="plot of chunk unnamed-chunk-13" width="648" style="display: block; margin: auto;" />
-
 --- &twocol
 
-## Bar Plot: When counts are pre-calculated...
+## When counts are pre-calculated...
 
 
 ```r
@@ -240,7 +210,7 @@ ggplot(precounted, aes(x=Species, y=Freq)) + geom_bar(stat='identity')
 ```
 
 *** =left
-<img src="assets/fig/unnamed-chunk-15.png" title="plot of chunk unnamed-chunk-15" alt="plot of chunk unnamed-chunk-15" width="468" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-10.png" title="plot of chunk unnamed-chunk-10" alt="plot of chunk unnamed-chunk-10" width="468" style="display: block; margin: auto;" />
 
 *** =right
 
@@ -256,40 +226,121 @@ ggplot(precounted, aes(x=Species, y=Freq)) + geom_bar(stat='identity')
   + Differ from `stat='bin'`
 + Negative bar is allowed
 
---- &twocol
-
-## Bar Plot: More differences...
-
-```r
-precounted$L <- letters[1:3]
-ggplot(precounted, aes(x=Species, y=Freq, fill=L)) + geom_bar(stat='identity')
-```
-
-*** =left
-<img src="assets/fig/unnamed-chunk-18.png" title="plot of chunk unnamed-chunk-18" alt="plot of chunk unnamed-chunk-18" width="468" style="display: block; margin: auto;" />
-
-*** =right
-
-```
-##      Species Freq L
-## 1     setosa    0 a
-## 2 versicolor   26 b
-## 3  virginica   44 c
-```
-+ Argument `fill` behave differently
-  + Here it is solely used to fill up colors
-  + No "grouping" operation here
-
 ---
 
-## Bar Plot: Reorder x
+## Reorder x
 
 ```r
 ggplot(precounted, aes(x=reorder(Species, -Freq), y=Freq)) + 
   geom_bar(stat='identity') # The order is determined by factor levels
 ```
 
-<img src="assets/fig/unnamed-chunk-20.png" title="plot of chunk unnamed-chunk-20" alt="plot of chunk unnamed-chunk-20" width="468" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-12.png" title="plot of chunk unnamed-chunk-12" alt="plot of chunk unnamed-chunk-12" width="468" style="display: block; margin: auto;" />
+
+---
+
+## Grouping: By Stacking
+
+```r
+siris <- dplyr::mutate(siris, Fat=(Sepal.Width > median(Sepal.Width)))
+# siris <- within(siris, Fat <- (Sepal.Width > median(Sepal.Width)))
+ggp_bygrp <- ggplot(siris, aes(x=Species, fill=Fat)); ggp_bygrp + geom_bar()
+```
+
+<img src="assets/fig/unnamed-chunk-13.png" title="plot of chunk unnamed-chunk-13" alt="plot of chunk unnamed-chunk-13" width="468" style="display: block; margin: auto;" />
+
+---
+
+## Change grouping var from `fill` to `color`...
+# Well, you should not be surprised by now
+
+```r
+# see ?aes_colour_fill_alpha for more about color grouping
+ggplot(siris, aes(x=Species, color=Fat)) + geom_bar()
+```
+
+<img src="assets/fig/unnamed-chunk-14.png" title="plot of chunk unnamed-chunk-14" alt="plot of chunk unnamed-chunk-14" width="468" style="display: block; margin: auto;" />
+
+---
+
+## Grouping: By Dodging
+
+```r
+ggp_bygrp + geom_bar(position='dodge') # ggp_bygrp + geom_bar(position=position_dodge(1))
+```
+
+<img src="assets/fig/unnamed-chunk-15.png" title="plot of chunk unnamed-chunk-15" alt="plot of chunk unnamed-chunk-15" width="468" style="display: block; margin: auto;" />
+
+---
+
+## What if x is continuous...
+
+```r
+ggplot(iris, aes(x=Sepal.Length)) + geom_bar() # a HISTOGRAM indeed!
+```
+
+<img src="assets/fig/unnamed-chunk-16.png" title="plot of chunk unnamed-chunk-16" alt="plot of chunk unnamed-chunk-16" width="468" style="display: block; margin: auto;" />
+
+---
+
+## Histogram Grouping: By Overlapping
+
+```r
+ggplot(iris, aes(x=Sepal.Length, fill=Species)) + 
+  geom_bar(position='identity', alpha=.4) # now we have seen stack, dodge, and identity
+```
+
+<img src="assets/fig/unnamed-chunk-17.png" title="plot of chunk unnamed-chunk-17" alt="plot of chunk unnamed-chunk-17" width="648" style="display: block; margin: auto;" />
+
+---
+
+## Exercise Time!
+> "God Help Those Who Help Themselves."
+
++ **Q.1**: Exactly how many `position`s do we have in `ggplot2`?
++ **Q.2**: What will happen if we plot the grouping barplot by position `identity`?
++ **Hint**: 
+  + We've already seen grouping by `stack`ing and `dodge`ing:
+
+```r
+# use constant
+ggplot(siris, aes(x=Species, fill=Fat)) + geom_bar(position='dodge') 
+# or default full function call to the specific position
+ggplot(siris, aes(x=Species, fill=Fat)) + geom_bar(position=position_dodge()) 
+```
+
+---
+
+## Overlapping Density
+
+```r
+ggplot(iris, aes(x=Sepal.Length, fill=Species)) + 
+  geom_density(position='identity', alpha=.4) # simply change geom_bar to geom_density
+```
+
+<img src="assets/fig/unnamed-chunk-19.png" title="plot of chunk unnamed-chunk-19" alt="plot of chunk unnamed-chunk-19" width="648" style="display: block; margin: auto;" />
+
+---
+
+## Overlapping Histogram with Density... Oops!
+
+```r
+ggplot(iris, aes(x=Sepal.Length, fill=Species)) + 
+  geom_bar(position='identity', alpha=.4) + geom_density(position='identity', alpha=.4)
+```
+
+<img src="assets/fig/unnamed-chunk-20.png" title="plot of chunk unnamed-chunk-20" alt="plot of chunk unnamed-chunk-20" width="648" style="display: block; margin: auto;" />
+
+---
+
+## Overlapping Histogram with Density
+
+```r
+ggplot(iris, aes(x=Sepal.Length, y=..density.., fill=Species)) + 
+  geom_bar(position='identity', alpha=.4) + geom_density(position='identity', alpha=.4)
+```
+
+<img src="assets/fig/unnamed-chunk-21.png" title="plot of chunk unnamed-chunk-21" alt="plot of chunk unnamed-chunk-21" width="648" style="display: block; margin: auto;" />
 
 ---
 
@@ -301,12 +352,12 @@ par(family='Heiti TC Light') # for OS X (XQuartz device)
 hist(salary_2013$平均工時, main=NULL)
 ```
 
-<img src="assets/fig/unnamed-chunk-21.png" title="plot of chunk unnamed-chunk-21" alt="plot of chunk unnamed-chunk-21" width="432" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-22.png" title="plot of chunk unnamed-chunk-22" alt="plot of chunk unnamed-chunk-22" width="432" style="display: block; margin: auto;" />
 
 ---
 
 ## Exercise: Try to plot this!
-<img src="assets/fig/unnamed-chunk-22.png" title="plot of chunk unnamed-chunk-22" alt="plot of chunk unnamed-chunk-22" width="864" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-23.png" title="plot of chunk unnamed-chunk-23" alt="plot of chunk unnamed-chunk-23" width="864" style="display: block; margin: auto;" />
 
 ---
 
@@ -326,47 +377,64 @@ ggplot(salary_2013, aes(x=reorder(行業,-平均工時), y=平均工時)) + # re
   # argument data is skipped in the second call to geom_bar
   geom_bar(aes(x=行業, y=as.numeric(as.character(加班工時))), stat='identity') +
   
-  # add arbitrary text (covered in latter part of this lecture)
+  # add arbitrary text (refer to the bonus section of this lecture)
   annotate('text', label='囧', color='red', family='Heiti TC Light', size=10, vjust=-.25,
            x=which(levels(reorder(salary_2013$行業,-salary_2013$平均工時)) == '製造業'), 
            y=as.numeric(as.character(salary_2013[salary_2013$行業=='製造業', '加班工時'])))
 ```
 
+---
+
+## A Digress: Export your plot as external file
++ Mehtods in `graphics` will NOT work
++ `ggplot2` has its own interface for saving plots as external files
+  + Refer to`?ggsave` for more details
+  + Example:
+
+```r
+aggplot <- ggplot(iris, aes(x=Sepal.Length, fill=Species)) + geom_bar()
+ggsave(filename='your_file_name.png', plot=aggplot)
+
+# the device used is auto determined by the filename extension
+# if plot is not specified, the last plot displayed will be saved
+```
+
 --- &twocol
 
-## Bar Plot: Proportional stacking (1/4)
+## Proportional Stacking
+> Yet another challenge. How to do this?
 
-Quiz time! How to do this?
 *** =left
 + Before...
-<img src="assets/fig/unnamed-chunk-24.png" title="plot of chunk unnamed-chunk-24" alt="plot of chunk unnamed-chunk-24" width="468" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-26.png" title="plot of chunk unnamed-chunk-26" alt="plot of chunk unnamed-chunk-26" width="468" style="display: block; margin: auto;" />
 *** =right
 + After...
-<img src="assets/fig/unnamed-chunk-25.png" title="plot of chunk unnamed-chunk-25" alt="plot of chunk unnamed-chunk-25" width="468" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-27.png" title="plot of chunk unnamed-chunk-27" alt="plot of chunk unnamed-chunk-27" width="468" style="display: block; margin: auto;" />
 
 ---
 
-## Bar Plot: Proportional stacking (2/4)
+## Proportional Stacking: Need Preprocessing
 + Unfortunately, no built-in automation available!
-+ Have to make the data proportional, and then use `stat='identity'`
++ Have to precompute the percentage in column, and then use `stat='identity'`
 
 ```r
 head(siris)[,1:5]
 ```
 
 ```
-##    Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
-## 51          7.0         3.2          4.7         1.4 versicolor
-## 52          6.4         3.2          4.5         1.5 versicolor
-## 53          6.9         3.1          4.9         1.5 versicolor
-## 55          6.5         2.8          4.6         1.5 versicolor
-## 57          6.3         3.3          4.7         1.6 versicolor
-## 59          6.6         2.9          4.6         1.3 versicolor
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
+## 1          7.0         3.2          4.7         1.4 versicolor
+## 2          6.4         3.2          4.5         1.5 versicolor
+## 3          6.9         3.1          4.9         1.5 versicolor
+## 4          6.5         2.8          4.6         1.5 versicolor
+## 5          6.3         3.3          4.7         1.6 versicolor
+## 6          6.6         2.9          4.6         1.3 versicolor
 ```
 
 ---
 
-## Bar Plot: Proportional stacking (3/4)
+## Proportional Stacking: Preprocessing 
+# Solution 1: Old-school (built-in methods only)
 
 ```r
 siris$Count <- 0L
@@ -384,43 +452,85 @@ siris_ag
 ## 3  virginica FALSE    27 0.6136
 ## 4  virginica  TRUE    17 0.3864
 ```
-+ There are many more elegant (and efficent) ways to do this:
-  + `plyr::ddply`
-  + `data.table::':='`
 
 ---
 
-## Bar Plot: Proportional stacking (4/4)
+## Proportional Stacking: Preprocessing 
+# Solution 2: the fancy `dplyr` package
+
+```r
+siris_ag <- summarise(group_by(siris, Species, Fat), Count=n())
+siris_ag <- mutate(siris_ag, Pct=Count/sum(Count))
+siris_ag
+```
+
+```
+## Source: local data frame [4 x 4]
+## Groups: Species
+## 
+##      Species   Fat Count    Pct
+## 1 versicolor FALSE    18 0.6923
+## 2 versicolor  TRUE     8 0.3077
+## 3  virginica FALSE    27 0.6136
+## 4  virginica  TRUE    17 0.3864
+```
+
+---
+
+## Proportional Stacking: Preprocessing 
+# Solution 3: `data.table` magic
+
+```r
+library(data.table)
+siris_ag <- as.data.table(siris)
+siris_ag <- siris_ag[,list(Count=.N), by='Species,Fat'][
+                     ,Pct:=Count/sum(Count), by='Species']
+# result not shown to save space
+```
+
+# Solution 4: forever SQL
+
+```r
+options(gsubfn.engine='R'); library(sqldf)
+tmp1 <- sqldf('select Species, Fat, count(*) as Count from siris group by Species, Fat')
+tmp2 <- sqldf('select Species, sum(Count) as cnt_by_species from tt group by Species')
+sqldf('select tmp1.Species, Fat, Count, (Count*1.0 / cnt_by_species) as Pct 
+       from tmp1 join tmp2 on tmp1.Species = tmp2.Species') -> siris_ag
+# result not shown to save space
+```
+
+---
+
+## Proportional Stacking Bar, Finally!
 
 ```r
 ggplot(siris_ag, aes(x=Species, y=Pct, fill=Fat)) + geom_bar(stat='identity')
 ```
 
-<img src="assets/fig/unnamed-chunk-28.png" title="plot of chunk unnamed-chunk-28" alt="plot of chunk unnamed-chunk-28" width="468" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-33.png" title="plot of chunk unnamed-chunk-33" alt="plot of chunk unnamed-chunk-33" width="468" style="display: block; margin: auto;" />
 
 ---
 
-## Bar Plot: Add some texts...(1/2)
+## Bar Plot with Annotation (1/2)
 
 ```r
 ggplot(siris_ag, aes(x=Species, y=Pct, fill=Fat)) + geom_bar(stat='identity') +
-  geom_text(aes(y=Pct, label=Count), color='white') # not easy!
+  geom_text(aes(y=Pct, label=Count), color='white') # notice that 'color' is outside aes()
 ```
 
-<img src="assets/fig/unnamed-chunk-29.png" title="plot of chunk unnamed-chunk-29" alt="plot of chunk unnamed-chunk-29" width="468" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-34.png" title="plot of chunk unnamed-chunk-34" alt="plot of chunk unnamed-chunk-34" width="468" style="display: block; margin: auto;" />
 
 ---
 
-## Bar Plot: Add some texts...(2/2)
+## Bar Plot with Annotation (2/2)
 
 ```r
-siris_ag <- do.call(rbind, lapply(split(siris_ag, siris_ag$Species), 
-                                  function(x) within(x, Cum.Pct <- cumsum(Pct))))
+siris_ag <- mutate(group_by(siris_ag, Species), Cum.Pct=cumsum(Pct))
 ggplot(siris_ag, aes(x=Species, y=Pct, fill=Fat)) + geom_bar(stat='identity') +
   geom_text(aes(y=Cum.Pct, label=Count), color='white', vjust=1.5)
 ```
 
-<img src="assets/fig/unnamed-chunk-30.png" title="plot of chunk unnamed-chunk-30" alt="plot of chunk unnamed-chunk-30" width="396" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-35.png" title="plot of chunk unnamed-chunk-35" alt="plot of chunk unnamed-chunk-35" width="396" style="display: block; margin: auto;" />
 
 ---
 
@@ -431,31 +541,20 @@ ggplot(siris_ag, aes(x=Species, y=Pct, fill=Fat)) + geom_bar(stat='identity') +
     <img height='400' src='assets/img/determined-serious-chiseled-not-okay.png' />
 </div>
 
----
-
-## A Digress: Function Equivalency
-+ Mnay of the parameters can be applied in multiple ways
-  + 
-  + `ggtitle('yor title')` is the same as `labs(title='your title')`
-  + See `?labs` for its equivalent calls
-+ Many of the functions are siblings of a more general function
-  + `geom_vline` is the sibling of `geom_abline`
-  + `theme_bw` is a special version of `theme`
-    + The default is `theme_grey`
-
 --- .segue .nobackground .dark
 
 ## Line Graph
 
 ---
 
-## Line Graph
+## It's just that simple!
 
 ```r
-ggplot(iris, aes(x=Sepal.Width, y=Sepal.Length)) + geom_line() # not meaningful
+# not meaningful but plottable
+ggplot(iris, aes(x=Sepal.Width, y=Sepal.Length)) + geom_line() 
 ```
 
-<img src="assets/fig/unnamed-chunk-31.png" title="plot of chunk unnamed-chunk-31" alt="plot of chunk unnamed-chunk-31" width="468" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-36.png" title="plot of chunk unnamed-chunk-36" alt="plot of chunk unnamed-chunk-36" width="468" style="display: block; margin: auto;" />
 
 ---
 
@@ -468,7 +567,19 @@ ggplot(iris, aes(x=Sepal.Width, y=Sepal.Length)) + geom_line() # not meaningful
 
 ---
 
-## Line Graph: Try another sameple data
+## A Digress: Function Equivalency in `ggplot2`
++ Mnay of the parameters can be applied in multiple ways
+  + 
+  + `ggtitle('yor title')` is the same as `labs(title='your title')`
+  + See `?labs` for its equivalent calls
++ Many of the functions are siblings of a more general function
+  + `geom_vline` is the sibling of `geom_abline`
+  + `theme_bw` is a special version of `theme`
+    + The default is `theme_grey`
+
+---
+
+## Let's try another sameple data
 
 ```r
 WorldPhones
@@ -495,7 +606,7 @@ str(WorldPhones)
 
 ---
 
-## Line Graph: Data.frame only, please!
+## `ggplot`: data.frame only, please!
 
 ```r
 ggplot(WorldPhones, aes(x=rownames(WorldPhones), y=Asia)) + geom_line()
@@ -518,70 +629,70 @@ class(WorldPhones.DF) # this time we should be fine!
 
 ---
 
-## Line Graph: What the...?
+## What the...?
 
 ```r
 ggplot(WorldPhones.DF, aes(x=year, y=Asia)) + geom_line()
 ```
 
-<img src="assets/fig/unnamed-chunk-35.png" title="plot of chunk unnamed-chunk-35" alt="plot of chunk unnamed-chunk-35" width="468" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-40.png" title="plot of chunk unnamed-chunk-40" alt="plot of chunk unnamed-chunk-40" width="468" style="display: block; margin: auto;" />
 
 ---
 
-## Line Graph: Correct the discrete-x issue
+## Correct the discrete-x issue
 
 ```r
 ggplot(WorldPhones.DF, aes(x=year, y=Asia, group=1)) + geom_line()
 ```
 
-<img src="assets/fig/unnamed-chunk-36.png" title="plot of chunk unnamed-chunk-36" alt="plot of chunk unnamed-chunk-36" width="468" style="display: block; margin: auto;" />
-
----
-
-## Line Graph: Or simply make x continous, if possible
-
-```r
-ggplot(WorldPhones.DF, aes(x=as.numeric(year), y=Asia)) + geom_line()
-```
-
-<img src="assets/fig/unnamed-chunk-37.png" title="plot of chunk unnamed-chunk-37" alt="plot of chunk unnamed-chunk-37" width="468" style="display: block; margin: auto;" />
-
---- &twocol
-
-## Line Graph: Wait a minute...
-Were they really drawn from the same data?
-*** =left
-<img src="assets/fig/unnamed-chunk-38.png" title="plot of chunk unnamed-chunk-38" alt="plot of chunk unnamed-chunk-38" width="468" style="display: block; margin: auto;" />
-
-*** =right
-<img src="assets/fig/unnamed-chunk-39.png" title="plot of chunk unnamed-chunk-39" alt="plot of chunk unnamed-chunk-39" width="468" style="display: block; margin: auto;" />
-
---- &twocol
-
-## Line Graph: Let's mark the data points
-Remember? Categorical x at default will not show null data.
-*** =left
-<img src="assets/fig/unnamed-chunk-40.png" title="plot of chunk unnamed-chunk-40" alt="plot of chunk unnamed-chunk-40" width="468" style="display: block; margin: auto;" />
-
-*** =right
 <img src="assets/fig/unnamed-chunk-41.png" title="plot of chunk unnamed-chunk-41" alt="plot of chunk unnamed-chunk-41" width="468" style="display: block; margin: auto;" />
 
 ---
 
-## Line Graph: Multi-lining using `matplot`
+## Or simply make x continous, if possible
 
 ```r
-matplot(x=WorldPhones.DF$year, y=WorldPhones.DF[,1:3], type='l', lty=1, col=1:3)
-legend('topleft', legend=colnames(WorldPhones.DF)[1:3], lty=1, col=1:3)
+ggplot(WorldPhones.DF, aes(x=as.numeric(year), y=Asia)) + geom_line()
 ```
 
 <img src="assets/fig/unnamed-chunk-42.png" title="plot of chunk unnamed-chunk-42" alt="plot of chunk unnamed-chunk-42" width="468" style="display: block; margin: auto;" />
 
 --- &twocol
 
-## Line Graph: Multi-lining
-+ Not straightforward in `ggplot`
-  + Only accept "long" format, against the "wide" format used in `matplot`
+## Wait a minute...
+Were they really drawn from the same data?
+*** =left
+<img src="assets/fig/unnamed-chunk-43.png" title="plot of chunk unnamed-chunk-43" alt="plot of chunk unnamed-chunk-43" width="468" style="display: block; margin: auto;" />
+
+*** =right
+<img src="assets/fig/unnamed-chunk-44.png" title="plot of chunk unnamed-chunk-44" alt="plot of chunk unnamed-chunk-44" width="468" style="display: block; margin: auto;" />
+
+--- &twocol
+
+## Can you see the difference?
+Remember? Categorical x at default will not show null data.
+*** =left
+<img src="assets/fig/unnamed-chunk-45.png" title="plot of chunk unnamed-chunk-45" alt="plot of chunk unnamed-chunk-45" width="468" style="display: block; margin: auto;" />
+
+*** =right
+<img src="assets/fig/unnamed-chunk-46.png" title="plot of chunk unnamed-chunk-46" alt="plot of chunk unnamed-chunk-46" width="468" style="display: block; margin: auto;" />
+
+---
+
+## Multi-lining using `graphics::matplot`
+
+```r
+matplot(x=WorldPhones.DF$year, y=WorldPhones.DF[,1:3], type='l', lty=1, col=1:3)
+legend('topleft', legend=colnames(WorldPhones.DF)[1:3], lty=1, col=1:3)
+```
+
+<img src="assets/fig/unnamed-chunk-47.png" title="plot of chunk unnamed-chunk-47" alt="plot of chunk unnamed-chunk-47" width="468" style="display: block; margin: auto;" />
+
+--- &twocol
+
+## Multi-lining in `ggplot2`
++ Not straightforward, usually need preprocessing
+  + Only accept **long** format, against the **wide** format used in `matplot`
 
 *** =left
 Wide format
@@ -616,7 +727,7 @@ Long format
 
 ---
 
-## Line Graph: Wide-to-long conversion
+## Wide-to-long Conversion
 
 ```r
 # solution 1: use stack
@@ -634,11 +745,11 @@ identical(WP.long$Value, WP.long2$Value)
 ```
 ## [1] TRUE
 ```
-+ Another popular alternative: `reshape2::melt`
++ Don't like old-school style? Refer to `reshape2::melt`
 
 --- &twocol
 
-## Line Graph: Wide-to-long conversion
+## The rest is easy!
 
 ```r
 ggplot(WP.long, aes(x=as.numeric(Year), y=Value, color=Region)) + geom_line()
@@ -667,38 +778,38 @@ WP.long[1:12,]
 ```
 
 *** =right
-<img src="assets/fig/unnamed-chunk-48.png" title="plot of chunk unnamed-chunk-48" alt="plot of chunk unnamed-chunk-48" width="468" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-53.png" title="plot of chunk unnamed-chunk-53" alt="plot of chunk unnamed-chunk-53" width="468" style="display: block; margin: auto;" />
 
 ---
 
-## Line Graph: Or group by linetype
+## More grouping var: linetype
 
 ```r
 ggplot(WP.long, aes(x=as.numeric(Year), y=Value, linetype=Region)) + geom_line()
 ```
 
-<img src="assets/fig/unnamed-chunk-49.png" title="plot of chunk unnamed-chunk-49" alt="plot of chunk unnamed-chunk-49" width="468" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-54.png" title="plot of chunk unnamed-chunk-54" alt="plot of chunk unnamed-chunk-54" width="468" style="display: block; margin: auto;" />
 
 ---
 
-## Line Graph: Again, beware of categorical x...
+## Again, beware of categorical x!
 
 ```r
 ggplot(WP.long, aes(x=Year, y=Value, linetype=Region, group=Region)) + geom_line()
 ```
 
-<img src="assets/fig/unnamed-chunk-50.png" title="plot of chunk unnamed-chunk-50" alt="plot of chunk unnamed-chunk-50" width="468" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-55.png" title="plot of chunk unnamed-chunk-55" alt="plot of chunk unnamed-chunk-55" width="468" style="display: block; margin: auto;" />
 
 ---
 
-## Line Graph: Reverse order of legend labels
+## Reverse order of legend labels
 
 ```r
 ggplot(WP.long, aes(x=as.numeric(Year), y=Value, linetype=Region)) + geom_line() +
   guides(linetype=guide_legend(reverse=TRUE))
 ```
 
-<img src="assets/fig/unnamed-chunk-51.png" title="plot of chunk unnamed-chunk-51" alt="plot of chunk unnamed-chunk-51" width="468" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-56.png" title="plot of chunk unnamed-chunk-56" alt="plot of chunk unnamed-chunk-56" width="468" style="display: block; margin: auto;" />
 
 ---
 
@@ -711,12 +822,12 @@ lines(x=salary_cpi$year, y=salary_cpi$real_wage, col='red')
 legend('bottomright', c('Nominal', 'Real'), lty=c(1,1), col=c('black','red'), inset=.02)
 ```
 
-<img src="assets/fig/unnamed-chunk-52.png" title="plot of chunk unnamed-chunk-52" alt="plot of chunk unnamed-chunk-52" width="648" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-57.png" title="plot of chunk unnamed-chunk-57" alt="plot of chunk unnamed-chunk-57" width="648" style="display: block; margin: auto;" />
 
 ---
 
 ## Exercise: Try to plot this!
-<img src="assets/fig/unnamed-chunk-53.png" title="plot of chunk unnamed-chunk-53" alt="plot of chunk unnamed-chunk-53" width="864" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-58.png" title="plot of chunk unnamed-chunk-58" alt="plot of chunk unnamed-chunk-58" width="864" style="display: block; margin: auto;" />
 
 ---
 
@@ -737,7 +848,8 @@ ggplot(tmp, aes(x=Year, y=Value, color=Type)) + # use color as grouping var
   scale_color_discrete(name='Salary Type', labels=c('Real', 'Nominal')) +
   
   # this will be covered latter
-  annotate('rect', xmin=97, xmax=99, ymin=-Inf, ymax=Inf, fill='blue', alpha=.25)
+  annotate('rect', xmin=97, xmax=99, ymin=-Inf, ymax=Inf, fill='blue', alpha=.25) +
+  annotate('text', label='try ?annotate for help', size=8, vjust=-.25, x=98, y=10000)
 ```
 
 --- .segue .nobackground .dark
@@ -746,98 +858,98 @@ ggplot(tmp, aes(x=Year, y=Value, color=Type)) + # use color as grouping var
 
 ---
 
-## Scatter plot: IMDB data
+## IMDB data
 
 ```r
 movies1 <- movies[!is.na(movies$budget),]
 ggplot(movies1, aes(x=budget, y=rating)) + geom_point()
 ```
 
-<img src="assets/fig/unnamed-chunk-55.png" title="plot of chunk unnamed-chunk-55" alt="plot of chunk unnamed-chunk-55" width="648" style="display: block; margin: auto;" />
-
----
-
-## Scatter plot: Control the shape & size of points
-
-```r
-ggplot(movies1, aes(x=budget, y=rating)) + geom_point(shape=5, size=3)
-```
-
-<img src="assets/fig/unnamed-chunk-56.png" title="plot of chunk unnamed-chunk-56" alt="plot of chunk unnamed-chunk-56" width="648" style="display: block; margin: auto;" />
-
----
-
-## All point shape types in `ggplot2`
-<img src="assets/fig/unnamed-chunk-57.png" title="plot of chunk unnamed-chunk-57" alt="plot of chunk unnamed-chunk-57" width="504" style="display: block; margin: auto;" />
-
----
-
-## Scatter plot: Grouping with binary variable
-# This usually happens accidentally.
-
-```r
-ggplot(movies1, aes(x=budget, y=rating, color=Action)) + geom_point()
-```
-
-<img src="assets/fig/unnamed-chunk-58.png" title="plot of chunk unnamed-chunk-58" alt="plot of chunk unnamed-chunk-58" width="648" style="display: block; margin: auto;" />
-
----
-
-## Scatter plot: Grouping with categarical variable
-
-```r
-ggplot(movies1, aes(x=budget, y=rating, color=factor(Action))) + 
-  geom_point() + labs(color='Action Movie?')
-```
-
-<img src="assets/fig/unnamed-chunk-59.png" title="plot of chunk unnamed-chunk-59" alt="plot of chunk unnamed-chunk-59" width="648" style="display: block; margin: auto;" />
-
----
-
-## Scatter plot: Multi-grouping
-
-```r
-ggplot(movies1, aes(x=budget, y=rating, color=factor(Action), shape=(length > 120))) + 
-  geom_point(size=3) + labs(color='Action Movie?')
-```
-
 <img src="assets/fig/unnamed-chunk-60.png" title="plot of chunk unnamed-chunk-60" alt="plot of chunk unnamed-chunk-60" width="648" style="display: block; margin: auto;" />
 
 ---
 
-## Scatter plot: Fit regression line
+## Control the shape & size of points
 
 ```r
-ggplot(movies, aes(x=votes, y=rating)) + geom_point() +
-  stat_smooth(method=lm, level=.95) # add se=FALSE to disable CI
+ggplot(movies1, aes(x=budget, y=rating)) + geom_point(shape=5, size=3)
 ```
 
 <img src="assets/fig/unnamed-chunk-61.png" title="plot of chunk unnamed-chunk-61" alt="plot of chunk unnamed-chunk-61" width="648" style="display: block; margin: auto;" />
 
 ---
 
-## Scatter plot: The default is polynomial fit
-
-```r
-ggplot(movies, aes(x=votes, y=rating)) + geom_point() + stat_smooth()
-```
-
-<img src="assets/fig/unnamed-chunk-62.png" title="plot of chunk unnamed-chunk-62" alt="plot of chunk unnamed-chunk-62" width="648" style="display: block; margin: auto;" />
+## All point shape types in `ggplot2`
+<img src="assets/fig/unnamed-chunk-62.png" title="plot of chunk unnamed-chunk-62" alt="plot of chunk unnamed-chunk-62" width="504" style="display: block; margin: auto;" />
 
 ---
 
-## Scatter plot: Fitting is smart to align with grouping
+## Grouping: by binary variable
+# This usually happens accidentally.
 
 ```r
-ggplot(movies1, aes(x=budget, y=rating, color=factor(Action))) + 
-  geom_point() + labs(color='Action Movie?') + stat_smooth(method=lm, se=FALSE)
+ggplot(movies1, aes(x=budget, y=rating, color=Action)) + geom_point()
 ```
 
 <img src="assets/fig/unnamed-chunk-63.png" title="plot of chunk unnamed-chunk-63" alt="plot of chunk unnamed-chunk-63" width="648" style="display: block; margin: auto;" />
 
 ---
 
-## Scatter plot: What if the model is pre-computed?
+## Grouping: by categarical variable
+
+```r
+ggplot(movies1, aes(x=budget, y=rating, color=factor(Action))) + 
+  geom_point() + labs(color='Action Movie?')
+```
+
+<img src="assets/fig/unnamed-chunk-64.png" title="plot of chunk unnamed-chunk-64" alt="plot of chunk unnamed-chunk-64" width="648" style="display: block; margin: auto;" />
+
+---
+
+## Multi-grouping
+
+```r
+ggplot(movies1, aes(x=budget, y=rating, color=factor(Action), shape=(length > 120))) + 
+  geom_point(size=3) + labs(color='Action Movie?')
+```
+
+<img src="assets/fig/unnamed-chunk-65.png" title="plot of chunk unnamed-chunk-65" alt="plot of chunk unnamed-chunk-65" width="648" style="display: block; margin: auto;" />
+
+---
+
+## Fit regression line
+
+```r
+ggplot(movies, aes(x=votes, y=rating)) + geom_point() +
+  stat_smooth(method=lm, level=.95) # add se=FALSE to disable CI
+```
+
+<img src="assets/fig/unnamed-chunk-66.png" title="plot of chunk unnamed-chunk-66" alt="plot of chunk unnamed-chunk-66" width="648" style="display: block; margin: auto;" />
+
+---
+
+## The default is a polynomial fit
+
+```r
+ggplot(movies, aes(x=votes, y=rating)) + geom_point() + stat_smooth()
+```
+
+<img src="assets/fig/unnamed-chunk-67.png" title="plot of chunk unnamed-chunk-67" alt="plot of chunk unnamed-chunk-67" width="648" style="display: block; margin: auto;" />
+
+---
+
+## Fitting is smart to align with grouping
+
+```r
+ggplot(movies1, aes(x=budget, y=rating, color=factor(Action))) + 
+  geom_point() + labs(color='Action Movie?') + stat_smooth(method=lm, se=FALSE)
+```
+
+<img src="assets/fig/unnamed-chunk-68.png" title="plot of chunk unnamed-chunk-68" alt="plot of chunk unnamed-chunk-68" width="648" style="display: block; margin: auto;" />
+
+---
+
+## What if the model is pre-computed?
 
 ```r
 lm_model <- lm(rating ~ budget, data=movies1)
@@ -845,11 +957,11 @@ ggplot(movies1, aes(x=budget, y=rating)) + geom_point() +
   geom_line(aes(x=budget, y=lm_model$fitted.values), color='blue')
 ```
 
-<img src="assets/fig/unnamed-chunk-64.png" title="plot of chunk unnamed-chunk-64" alt="plot of chunk unnamed-chunk-64" width="648" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-69.png" title="plot of chunk unnamed-chunk-69" alt="plot of chunk unnamed-chunk-69" width="648" style="display: block; margin: auto;" />
 
 ---
 
-## Scatter plot: Anotation
+## Scatter plot "as is": Using `geom_text`
 
 ```r
 starmovies <- movies[movies$votes > mean(movies$votes),]
@@ -857,11 +969,11 @@ starmovies <- starmovies[order(-starmovies$rating),][1:10,]
 ggplot(starmovies, aes(x=votes, y=rating)) + geom_point() + geom_text(aes(label=title))
 ```
 
-<img src="assets/fig/unnamed-chunk-65.png" title="plot of chunk unnamed-chunk-65" alt="plot of chunk unnamed-chunk-65" width="648" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-70.png" title="plot of chunk unnamed-chunk-70" alt="plot of chunk unnamed-chunk-70" width="648" style="display: block; margin: auto;" />
 
 ---
 
-## Scatter plot: Fine-tune
+## Fine-tune
 
 ```r
 ggplot(starmovies, aes(x=votes, y=rating)) + geom_point(color='red') + 
@@ -870,103 +982,11 @@ ggplot(starmovies, aes(x=votes, y=rating)) + geom_point(color='red') +
   ylim(min(starmovies$rating), 9.2)
 ```
 
-<img src="assets/fig/unnamed-chunk-66.png" title="plot of chunk unnamed-chunk-66" alt="plot of chunk unnamed-chunk-66" width="720" style="display: block; margin: auto;" />
-
---- .segue .nobackground .dark
-
-## Annotation
+<img src="assets/fig/unnamed-chunk-71.png" title="plot of chunk unnamed-chunk-71" alt="plot of chunk unnamed-chunk-71" width="720" style="display: block; margin: auto;" />
 
 ---
 
-## Annotation
-
-```r
-plot(movies1$budget, movies1$rating) # base solution
-abline(h=median(movies1$rating), col='red')
-text(x=max(movies1$budget)*.9, y=median(movies1$rating), 
-     labels='Median of Rating', col='red', pos=1)
-```
-
-<img src="assets/fig/unnamed-chunk-67.png" title="plot of chunk unnamed-chunk-67" alt="plot of chunk unnamed-chunk-67" width="648" style="display: block; margin: auto;" />
-
----
-
-## Annotation: Add lines
-
-```r
-brggp <- ggplot(movies1, aes(x=budget, y=rating)) + geom_point() 
-brggp + geom_hline(yintercept=median(movies1$rating)) # ?geom_abline for general setup
-# brggp + geom_hline(data=movies1, aes(yintercept=median(rating)))  # the same
-# brggp + geom_hline(aes(yintercept=median(movies1$rating)))        # the same
-```
-
-<img src="assets/fig/unnamed-chunk-68.png" title="plot of chunk unnamed-chunk-68" alt="plot of chunk unnamed-chunk-68" width="648" style="display: block; margin: auto;" />
-
----
-
-## Annotation: Add (single) texts
-
-```r
-brggp + geom_hline(yintercept=median(movies1$rating), color='red') + 
-  annotate('text', x=Inf, y=median(movies1$rating), 
-           label='Medaion of Rating', color='red', vjust=1.2, hjust=1)
-# Don't use geom_text for single annotation to avoid overplotting
-```
-
-<img src="assets/fig/unnamed-chunk-69.png" title="plot of chunk unnamed-chunk-69" alt="plot of chunk unnamed-chunk-69" width="648" style="display: block; margin: auto;" />
-
----
-
-## Annotation: Add segments
-
-```r
-shaw <- movies1[grep('Shawshank Redemption', movies1$title, fixed=TRUE),]
-brggp + annotate('segment', xend=shaw$budget, yend=shaw$rating, x=Inf, y=-Inf,
-                 arrow=arrow(), color='red') +
-  annotate('text', label='The Shawshank Redemption?', x=Inf, y=-Inf,
-           hjust=1.5, vjust=-1, color='red')
-```
-
-<img src="assets/fig/unnamed-chunk-70.png" title="plot of chunk unnamed-chunk-70" alt="plot of chunk unnamed-chunk-70" width="648" style="display: block; margin: auto;" />
-
----
-
-## Annotation: Add shaded area
-
-```r
-yearcount <- aggregate(title ~ year, data=movies, FUN=length)
-ggplot(yearcount, aes(x=year, y=title)) + geom_line() +
-  annotate('rect', xmin=1990, xmax=2000, ymin=-Inf, ymax=Inf, fill='blue', alpha=.25)
-```
-
-<img src="assets/fig/unnamed-chunk-71.png" title="plot of chunk unnamed-chunk-71" alt="plot of chunk unnamed-chunk-71" width="648" style="display: block; margin: auto;" />
-
----
-
-## A Digress: Adjust the x ticks with arbitrary breaks
-
-```r
-ggplot(yearcount, aes(x=year, y=title)) + geom_line() +
-  scale_x_continuous(breaks=seq(min(yearcount$year), max(yearcount$year), 2))
-```
-
-<img src="assets/fig/unnamed-chunk-72.png" title="plot of chunk unnamed-chunk-72" alt="plot of chunk unnamed-chunk-72" width="648" style="display: block; margin: auto;" />
-
----
-
-## A Digress: Rotate the x-tick labels
-
-```r
-ggplot(yearcount, aes(x=year, y=title)) + geom_line() +
-  scale_x_continuous(breaks=seq(min(yearcount$year), max(yearcount$year), 2)) + 
-  theme(axis.text.x=element_text(angle=90, hjust=1, vjust=.5))
-```
-
-<img src="assets/fig/unnamed-chunk-73.png" title="plot of chunk unnamed-chunk-73" alt="plot of chunk unnamed-chunk-73" width="648" style="display: block; margin: auto;" />
-
----
-
-## Exercise
+## The Final Challenge:
 # Which type of film cost the most, averagely?
 
 ```r
@@ -991,14 +1011,14 @@ summary(lmfit)$coef # where is type 'Short'?
 
 ---
 
-## Exercise: Try to plot this!
-# What is the association between cost and rating, conditional on type?
-# (This one is tough!)
-<img src="assets/fig/unnamed-chunk-75.png" title="plot of chunk unnamed-chunk-75" alt="plot of chunk unnamed-chunk-75" width="864" style="display: block; margin: auto;" />
+## Try to plot this!
+> What is the association between cost and rating, conditional on type?
+
+<img src="assets/fig/unnamed-chunk-73.png" title="plot of chunk unnamed-chunk-73" alt="plot of chunk unnamed-chunk-73" width="864" style="display: block; margin: auto;" />
 
 ---
 
-## Exercise: Hint
+## A Hint:
 # You need to convert multiple dummies into one factor
 + Before:
 
@@ -1043,7 +1063,7 @@ ggplot(movies1_singletype, aes(x=budget, y=rating, color=Type)) +
 
 ---
 
-## Exercise: The regression problem behind the scene
+## The regression problem behind the scene
 
 ```r
 interact_terms <- paste(paste(movietype, '*budget', sep=''), collapse=' + ')
@@ -1064,9 +1084,88 @@ tail(summary(lmfit)$coef)
 + **Visualization != Analysis** (Our eyes were not born to work on numbers.)
 + Plots can be easily manipluated to be misleading, accidentally or **on purpose**
 
+---
+
+## References
++ [ggplot2 Official document](http://ggplot2.org/)
++ [R Graphics Cookbook](http://www.cookbook-r.com/Graphs/)
++ [Source code of this slide](https://github.com/everdark/lecture_ggplot)
+  + The source is tested only on OS X 10.9.3
++ [Introduction to Programming R](https://github.com/everdark/lecture_rintro)
+  + Knowlege of general programming is requisite
+
 --- .segue .nobackground .dark
 
-## Facet: Multi-plotting
+## Bonus: Annotation
+
+---
+
+## Annotation
+
+```r
+plot(movies1$budget, movies1$rating) # base solution
+abline(h=median(movies1$rating), col='red')
+text(x=max(movies1$budget)*.9, y=median(movies1$rating), 
+     labels='Median of Rating', col='red', pos=1)
+```
+
+<img src="assets/fig/unnamed-chunk-78.png" title="plot of chunk unnamed-chunk-78" alt="plot of chunk unnamed-chunk-78" width="648" style="display: block; margin: auto;" />
+
+---
+
+## Annotation: Add lines
+
+```r
+brggp <- ggplot(movies1, aes(x=budget, y=rating)) + geom_point() 
+brggp + geom_hline(yintercept=median(movies1$rating)) # ?geom_abline for general setup
+# brggp + geom_hline(data=movies1, aes(yintercept=median(rating)))  # the same
+# brggp + geom_hline(aes(yintercept=median(movies1$rating)))        # the same
+```
+
+<img src="assets/fig/unnamed-chunk-79.png" title="plot of chunk unnamed-chunk-79" alt="plot of chunk unnamed-chunk-79" width="648" style="display: block; margin: auto;" />
+
+---
+
+## Annotation: Add (single) texts
+
+```r
+brggp + geom_hline(yintercept=median(movies1$rating), color='red') + 
+  annotate('text', x=Inf, y=median(movies1$rating), 
+           label='Medaion of Rating', color='red', vjust=1.2, hjust=1)
+# Don't use geom_text for single annotation to avoid overplotting
+```
+
+<img src="assets/fig/unnamed-chunk-80.png" title="plot of chunk unnamed-chunk-80" alt="plot of chunk unnamed-chunk-80" width="648" style="display: block; margin: auto;" />
+
+---
+
+## Annotation: Add segments
+
+```r
+shaw <- movies1[grep('Shawshank Redemption', movies1$title, fixed=TRUE),]
+brggp + annotate('segment', xend=shaw$budget, yend=shaw$rating, x=Inf, y=-Inf,
+                 arrow=arrow(), color='red') +
+  annotate('text', label='The Shawshank Redemption?', x=Inf, y=-Inf,
+           hjust=1.5, vjust=-1, color='red')
+```
+
+<img src="assets/fig/unnamed-chunk-81.png" title="plot of chunk unnamed-chunk-81" alt="plot of chunk unnamed-chunk-81" width="648" style="display: block; margin: auto;" />
+
+---
+
+## Annotation: Add shaded area
+
+```r
+yearcount <- aggregate(title ~ year, data=movies, FUN=length)
+ggplot(yearcount, aes(x=year, y=title)) + geom_line() +
+  annotate('rect', xmin=1990, xmax=2000, ymin=-Inf, ymax=Inf, fill='blue', alpha=.25)
+```
+
+<img src="assets/fig/unnamed-chunk-82.png" title="plot of chunk unnamed-chunk-82" alt="plot of chunk unnamed-chunk-82" width="648" style="display: block; margin: auto;" />
+
+--- .segue .nobackground .dark
+
+## Bonus: Facet / Multi-plotting
 
 ---
 
@@ -1077,7 +1176,7 @@ gg <- ggplot(movies1_singletype, aes(x=rating, y=..density..)) + geom_bar()
 gg + facet_grid(Action ~ .) # Plot with grouping variable in different window (Vertical)
 ```
 
-<img src="assets/fig/unnamed-chunk-80.png" title="plot of chunk unnamed-chunk-80" alt="plot of chunk unnamed-chunk-80" width="576" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-83.png" title="plot of chunk unnamed-chunk-83" alt="plot of chunk unnamed-chunk-83" width="576" style="display: block; margin: auto;" />
 
 ---
 
@@ -1088,7 +1187,7 @@ gg + facet_grid(Action ~ .) # Plot with grouping variable in different window (V
 gg + facet_grid(. ~ Action) 
 ```
 
-<img src="assets/fig/unnamed-chunk-81.png" title="plot of chunk unnamed-chunk-81" alt="plot of chunk unnamed-chunk-81" width="576" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-84.png" title="plot of chunk unnamed-chunk-84" alt="plot of chunk unnamed-chunk-84" width="576" style="display: block; margin: auto;" />
 
 ---
 
@@ -1100,7 +1199,7 @@ ggplot(movies1_singletype, aes(x=rating, y=..density..)) +
   geom_bar() + facet_grid(modern ~ Action)
 ```
 
-<img src="assets/fig/unnamed-chunk-82.png" title="plot of chunk unnamed-chunk-82" alt="plot of chunk unnamed-chunk-82" width="576" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-85.png" title="plot of chunk unnamed-chunk-85" alt="plot of chunk unnamed-chunk-85" width="576" style="display: block; margin: auto;" />
 
 ---
 
@@ -1112,7 +1211,7 @@ ggplot(movies1_singletype, aes(x=rating, color=modern)) +
   geom_line(stat="density") + facet_grid(Type ~ rated)
 ```
 
-<img src="assets/fig/unnamed-chunk-83.png" title="plot of chunk unnamed-chunk-83" alt="plot of chunk unnamed-chunk-83" width="576" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-86.png" title="plot of chunk unnamed-chunk-86" alt="plot of chunk unnamed-chunk-86" width="576" style="display: block; margin: auto;" />
 
 ---
 
@@ -1148,7 +1247,7 @@ ggplot(movies1_singletype, aes(x=rating, color=modern)) +
   geom_line(stat="density") + facet_grid(Type ~ rated, labeller=mylabeller)
 ```
 
-<img src="assets/fig/unnamed-chunk-85.png" title="plot of chunk unnamed-chunk-85" alt="plot of chunk unnamed-chunk-85" width="576" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-88.png" title="plot of chunk unnamed-chunk-88" alt="plot of chunk unnamed-chunk-88" width="576" style="display: block; margin: auto;" />
 
 ---
 
@@ -1167,7 +1266,7 @@ drawPoint <- function(i) {
 drawPoint(25)
 ```
 
-<img src="assets/fig/unnamed-chunk-86.png" title="plot of chunk unnamed-chunk-86" alt="plot of chunk unnamed-chunk-86" width="216" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-89.png" title="plot of chunk unnamed-chunk-89" alt="plot of chunk unnamed-chunk-89" width="216" style="display: block; margin: auto;" />
 
 ---
 
@@ -1180,25 +1279,6 @@ symbols <- do.call(arrangeGrob, symbol_points)
 symbols
 ```
 
-<img src="assets/fig/unnamed-chunk-87.png" title="plot of chunk unnamed-chunk-87" alt="plot of chunk unnamed-chunk-87" width="396" style="display: block; margin: auto;" />
-
---- .segue .nobackground .dark
-
-## Output
-
----
-
-## Export your plot as external file
-+ `?ggsave`
-+ That's it. Period.
-
----
-
-## References
-+ [R Graphics Cookbook](http://www.cookbook-r.com/Graphs/)
-+ [Source code of this slide](https://github.com/everdark/lecture_ggplot)
-  + The source is tested only on OS X 10.9.3
-+ [Introduction to Programming R](https://github.com/everdark/lecture_rintro)
-  + Knowlege of general programming is requisite
+<img src="assets/fig/unnamed-chunk-90.png" title="plot of chunk unnamed-chunk-90" alt="plot of chunk unnamed-chunk-90" width="396" style="display: block; margin: auto;" />
 
 
