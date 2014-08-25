@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
     media="only screen and (max-device-width: 480px)" >
   <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
-  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/zenburn.css" />
   <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/customized.css"></link>
 <link rel=stylesheet href="./assets/css/ribbons.css"></link>
 
@@ -360,7 +360,8 @@ ggp + geom_bar()
     <h2>Change colors!</h2>
   </hgroup>
   <article data-timings="">
-    <pre><code class="r">ggp + geom_bar(fill=&#39;snow&#39;, color=&#39;black&#39;) # see colors() if you&#39;re picky
+    <pre><code class="r"># want to customize colors? refer to: www.cookbook-r.com/Graphs/Colors_(ggplot2)/
+ggp + geom_bar(fill=&#39;snow&#39;, color=&#39;black&#39;) # see colors() if you&#39;re picky
 </code></pre>
 
 <p><img src="assets/fig/unnamed-chunk-8.png" title="plot of chunk unnamed-chunk-8" alt="plot of chunk unnamed-chunk-8" width="468" style="display: block; margin: auto;" /></p>
@@ -578,7 +579,7 @@ ggplot(siris, aes(x=Species, fill=Fat)) + geom_bar(position=position_dodge())
     <h2>Exercise: Working hours by industry?</h2>
   </hgroup>
   <article data-timings="">
-    <pre><code class="r">load(&#39;salary.RData&#39;)
+    <pre><code class="r">data(&quot;salary&quot;, package=&quot;DSC2014Tutorial&quot;)
 par(family=&#39;Heiti TC Light&#39;) # for OS X (XQuartz device)
 hist(salary_2013$平均工時, main=NULL)
 </code></pre>
@@ -740,7 +741,8 @@ siris_ag
   <article data-timings="">
     <h1>Solution 2: the fancy <code>dplyr</code> package</h1>
 
-<pre><code class="r">siris_ag &lt;- summarise(group_by(siris, Species, Fat), Count=n())
+<pre><code class="r">library(dplyr)
+siris_ag &lt;- summarise(group_by(siris, Species, Fat), Count=n())
 siris_ag &lt;- mutate(siris_ag, Pct=Count/sum(Count))
 siris_ag
 </code></pre>
@@ -777,7 +779,7 @@ siris_ag &lt;- siris_ag[,list(Count=.N), by=&#39;Species,Fat&#39;][
 
 <pre><code class="r">options(gsubfn.engine=&#39;R&#39;); library(sqldf)
 tmp1 &lt;- sqldf(&#39;select Species, Fat, count(*) as Count from siris group by Species, Fat&#39;)
-tmp2 &lt;- sqldf(&#39;select Species, sum(Count) as cnt_by_species from tt group by Species&#39;)
+tmp2 &lt;- sqldf(&#39;select Species, sum(Count) as cnt_by_species from tmp1 group by Species&#39;)
 sqldf(&#39;select tmp1.Species, Fat, Count, (Count*1.0 / cnt_by_species) as Pct 
        from tmp1 join tmp2 on tmp1.Species = tmp2.Species&#39;) -&gt; siris_ag
 # result not shown to save space
@@ -821,7 +823,7 @@ sqldf(&#39;select tmp1.Species, Fat, Count, (Count*1.0 / cnt_by_species) as Pct
     <h2>Bar Plot with Annotation (2/2)</h2>
   </hgroup>
   <article data-timings="">
-    <pre><code class="r">siris_ag &lt;- mutate(group_by(siris_ag, Species), Cum.Pct=cumsum(Pct))
+    <pre><code class="r">library(dplyr); siris_ag &lt;- mutate(group_by(siris_ag, Species), Cum.Pct=cumsum(Pct))
 ggplot(siris_ag, aes(x=Species, y=Pct, fill=Fat)) + geom_bar(stat=&#39;identity&#39;) +
   geom_text(aes(y=Cum.Pct, label=Count), color=&#39;white&#39;, vjust=1.5)
 </code></pre>
@@ -1687,7 +1689,7 @@ brggp + geom_hline(yintercept=median(movies1$rating)) # ?geom_abline for general
   <article data-timings="">
     <pre><code class="r">shaw &lt;- movies1[grep(&#39;Shawshank Redemption&#39;, movies1$title, fixed=TRUE),]
 brggp + annotate(&#39;segment&#39;, xend=shaw$budget, yend=shaw$rating, x=Inf, y=-Inf,
-                 arrow=arrow(), color=&#39;red&#39;) +
+                 arrow=grid::arrow(), color=&#39;red&#39;) +
   annotate(&#39;text&#39;, label=&#39;The Shawshank Redemption?&#39;, x=Inf, y=-Inf,
            hjust=1.5, vjust=-1, color=&#39;red&#39;)
 </code></pre>

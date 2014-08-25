@@ -5,6 +5,7 @@ author      : Kyle Chung
 job         : DSConf 2014 Taipei
 framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
 highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : zenburn
 <--!hitheme     : solarized_dark-->
 widgets     : []            # {mathjax, quiz, bootstrap}
 mode        : selfcontained # {standalone, draft}
@@ -194,6 +195,7 @@ ggp + geom_bar()
 ## Change colors!
 
 ```r
+# want to customize colors? refer to: www.cookbook-r.com/Graphs/Colors_(ggplot2)/
 ggp + geom_bar(fill='snow', color='black') # see colors() if you're picky
 ```
 
@@ -347,7 +349,7 @@ ggplot(iris, aes(x=Sepal.Length, y=..density.., fill=Species)) +
 ## Exercise: Working hours by industry?
 
 ```r
-load('salary.RData')
+data("salary", package="DSC2014Tutorial")
 par(family='Heiti TC Light') # for OS X (XQuartz device)
 hist(salary_2013$平均工時, main=NULL)
 ```
@@ -459,6 +461,7 @@ siris_ag
 # Solution 2: the fancy `dplyr` package
 
 ```r
+library(dplyr)
 siris_ag <- summarise(group_by(siris, Species, Fat), Count=n())
 siris_ag <- mutate(siris_ag, Pct=Count/sum(Count))
 siris_ag
@@ -493,7 +496,7 @@ siris_ag <- siris_ag[,list(Count=.N), by='Species,Fat'][
 ```r
 options(gsubfn.engine='R'); library(sqldf)
 tmp1 <- sqldf('select Species, Fat, count(*) as Count from siris group by Species, Fat')
-tmp2 <- sqldf('select Species, sum(Count) as cnt_by_species from tt group by Species')
+tmp2 <- sqldf('select Species, sum(Count) as cnt_by_species from tmp1 group by Species')
 sqldf('select tmp1.Species, Fat, Count, (Count*1.0 / cnt_by_species) as Pct 
        from tmp1 join tmp2 on tmp1.Species = tmp2.Species') -> siris_ag
 # result not shown to save space
@@ -525,7 +528,7 @@ ggplot(siris_ag, aes(x=Species, y=Pct, fill=Fat)) + geom_bar(stat='identity') +
 ## Bar Plot with Annotation (2/2)
 
 ```r
-siris_ag <- mutate(group_by(siris_ag, Species), Cum.Pct=cumsum(Pct))
+library(dplyr); siris_ag <- mutate(group_by(siris_ag, Species), Cum.Pct=cumsum(Pct))
 ggplot(siris_ag, aes(x=Species, y=Pct, fill=Fat)) + geom_bar(stat='identity') +
   geom_text(aes(y=Cum.Pct, label=Count), color='white', vjust=1.5)
 ```
@@ -1144,7 +1147,7 @@ brggp + geom_hline(yintercept=median(movies1$rating), color='red') +
 ```r
 shaw <- movies1[grep('Shawshank Redemption', movies1$title, fixed=TRUE),]
 brggp + annotate('segment', xend=shaw$budget, yend=shaw$rating, x=Inf, y=-Inf,
-                 arrow=arrow(), color='red') +
+                 arrow=grid::arrow(), color='red') +
   annotate('text', label='The Shawshank Redemption?', x=Inf, y=-Inf,
            hjust=1.5, vjust=-1, color='red')
 ```
