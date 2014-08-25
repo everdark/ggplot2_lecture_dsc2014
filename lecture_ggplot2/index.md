@@ -349,7 +349,7 @@ ggplot(iris, aes(x=Sepal.Length, y=..density.., fill=Species)) +
 ## Exercise: Working hours by industry?
 
 ```r
-data("salary", package="DSC2014Tutorial")
+data("salary", package="DSC2014Tutorial") # or load('salary.RData')
 par(family='Heiti TC Light') # for OS X (XQuartz device)
 hist(salary_2013$平均工時, main=NULL)
 ```
@@ -755,7 +755,8 @@ identical(WP.long$Value, WP.long2$Value)
 ## The rest is easy!
 
 ```r
-ggplot(WP.long, aes(x=as.numeric(Year), y=Value, color=Region)) + geom_line()
+WP.long$Year <- as.integer(as.character(WP.long$Year))
+ggplot(WP.long, aes(x=Year, y=Value, color=Region)) + geom_line()
 ```
 
 *** =left
@@ -788,7 +789,7 @@ WP.long[1:12,]
 ## More grouping var: linetype
 
 ```r
-ggplot(WP.long, aes(x=as.numeric(Year), y=Value, linetype=Region)) + geom_line()
+ggplot(WP.long, aes(x=Year, y=Value, linetype=Region)) + geom_line()
 ```
 
 <img src="assets/fig/unnamed-chunk-54.png" title="plot of chunk unnamed-chunk-54" alt="plot of chunk unnamed-chunk-54" width="468" style="display: block; margin: auto;" />
@@ -798,7 +799,7 @@ ggplot(WP.long, aes(x=as.numeric(Year), y=Value, linetype=Region)) + geom_line()
 ## Again, beware of categorical x!
 
 ```r
-ggplot(WP.long, aes(x=Year, y=Value, linetype=Region, group=Region)) + geom_line()
+ggplot(WP.long, aes(x=factor(Year), y=Value, linetype=Region, group=Region)) + geom_line()
 ```
 
 <img src="assets/fig/unnamed-chunk-55.png" title="plot of chunk unnamed-chunk-55" alt="plot of chunk unnamed-chunk-55" width="468" style="display: block; margin: auto;" />
@@ -808,7 +809,7 @@ ggplot(WP.long, aes(x=Year, y=Value, linetype=Region, group=Region)) + geom_line
 ## Reverse order of legend labels
 
 ```r
-ggplot(WP.long, aes(x=as.numeric(Year), y=Value, linetype=Region)) + geom_line() +
+ggplot(WP.long, aes(x=Year, y=Value, linetype=Region)) + geom_line() +
   guides(linetype=guide_legend(reverse=TRUE))
 ```
 
@@ -819,7 +820,7 @@ ggplot(WP.long, aes(x=as.numeric(Year), y=Value, linetype=Region)) + geom_line()
 ## Exercise: Real wage trending down...
 
 ```r
-load('salary.RData'); par(family='Heiti TC Light') # for OS X (XQuartz device)
+data("salary", package="DSC2014Tutorial") # or load('salary.RData')
 plot(x=salary_cpi$year, y=salary_cpi$salary, type='l', xlab='Year', ylab='Wage')
 lines(x=salary_cpi$year, y=salary_cpi$real_wage, col='red')
 legend('bottomright', c('Nominal', 'Real'), lty=c(1,1), col=c('black','red'), inset=.02)
