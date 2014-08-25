@@ -42,14 +42,14 @@ license: by-nc-sa
 
 ## Outline
 
-+ Basic Syntax
++ [Basic Syntax](#6)
 + Basic Graphing
-  + Bar Plots
-  + Line Graphs
-  + Scatter plots
+  + [Bar Plots](#10)
+  + [Line Graphs](#41)
+  + [Scatter plots](#62)
 + Some Advanced Graphing Tips
-  + [Bonus] Annotaton
-  + [Bonus] Facet: Multi-plotting
+  + [Bonus] [Annotaton](#81)
+  + [Bonus] [Facet: Multi-plotting](#87)
 
 --- &twocol
 
